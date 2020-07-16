@@ -318,7 +318,7 @@ class ModelCatalog:
 
                     def track_var_creation(next_creator, **kw):
                         v = next_creator(**kw)
-                        created.add(v)
+                        created.add(v.ref())
                         return v
 
                     with tf.variable_creator_scope(track_var_creation):
@@ -345,7 +345,7 @@ class ModelCatalog:
                     registered = set(instance.variables())
                     not_registered = set()
                     for var in created:
-                        if var not in registered:
+                        if var.ref() not in registered:
                             not_registered.add(var)
                     if not_registered:
                         raise ValueError(
