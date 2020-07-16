@@ -342,11 +342,11 @@ class ModelCatalog:
                             # Other error -> re-raise.
                             else:
                                 raise e
-                    registered = set(instance.variables())
+                    registered = set([v.ref() for v in instance.variables()])
                     not_registered = set()
                     for var in created:
-                        if var.ref() not in registered:
-                            not_registered.add(var)
+                        if var not in registered:
+                            not_registered.add(var.ref())
                     if not_registered:
                         raise ValueError(
                             "It looks like variables {} were created as part "
