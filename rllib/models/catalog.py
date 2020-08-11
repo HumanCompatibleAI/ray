@@ -315,7 +315,7 @@ class ModelCatalog:
 
                     def track_var_creation(next_creator, **kw):
                         v = next_creator(**kw)
-                        created.add(v)
+                        created.add(v.ref())
                         return v
 
                     with tf.variable_creator_scope(track_var_creation):
@@ -339,11 +339,11 @@ class ModelCatalog:
                             # Other error -> re-raise.
                             else:
                                 raise e
-                    registered = set(instance.variables())
+                    registered = set([v.ref() for v in instance.variables()])
                     not_registered = set()
                     for var in created:
                         if var not in registered:
-                            not_registered.add(var)
+                            not_registered.add(var.ref())
                     if not_registered:
                         raise ValueError(
                             "It looks like variables {} were created as part "
