@@ -343,9 +343,9 @@ class ModelCatalog:
                     not_registered = set()
                     for var in created:
                         if var not in registered:
-                            not_registered.add(var.ref())
+                            not_registered.add(var)
                     if not_registered:
-                        raise ValueError(
+                        print(
                             "It looks like variables {} were created as part "
                             "of {} but does not appear in model.variables() "
                             "({}). Did you forget to call "
