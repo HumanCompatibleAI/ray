@@ -345,13 +345,19 @@ class ModelCatalog:
                         if var not in registered:
                             not_registered.add(var)
                     if not_registered:
+                        def summarize_var_ref(ref):
+                            """Get a string summary for a variable reference."""
+                            var = ref.deref()
+                            return f"<tf.Varaible {var.name} shape={var.shape} {var.dtype}>"
+                        not_registered_names = [summarize_var_ref(x) for x in not_registered]
+                        registered_names = [summarize_var_ref(x) for x in registered]
                         print(
                             "It looks like variables {} were created as part "
                             "of {} but does not appear in model.variables() "
                             "({}). Did you forget to call "
                             "model.register_variables() on the variables in "
-                            "question?".format(not_registered, instance,
-                                               registered))
+                            "question?".format(not_registered_names, instance,
+                                               registered_names))
                 else:
                     # PyTorch automatically tracks nn.Modules inside the parent
                     # nn.Module's constructor.
