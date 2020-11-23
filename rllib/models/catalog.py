@@ -313,7 +313,7 @@ class ModelCatalog:
 
                 def track_var_creation(next_creator, **kw):
                     v = next_creator(**kw)
-                    created.add(v)
+                    created.add(v.ref())
                     return v
 
                 with tf.variable_creator_scope(track_var_creation):
@@ -337,19 +337,25 @@ class ModelCatalog:
                         # Other error -> re-raise.
                         else:
                             raise e
-                registered = set(instance.variables())
+                registered = set([v.ref() for v in instance.variables()])
                 not_registered = set()
                 for var in created:
                     if var not in registered:
                         not_registered.add(var)
                 if not_registered:
-                    raise ValueError(
+                   def summarize_var_ref(ref):
+                       """Get a string summary for a variable reference."""
+                       var = ref.deref()
+                       return f"<tf.Varaible {var.name} shape={var.shape} {var.dtype}>"
+                   not_registered_names = [summarize_var_ref(x) for x in not_registered]
+                   registered_names = [summarize_var_ref(x) for x in registered]
+                   print(
                         "It looks like variables {} were created as part "
                         "of {} but does not appear in model.variables() "
                         "({}). Did you forget to call "
                         "model.register_variables() on the variables in "
-                        "question?".format(not_registered, instance,
-                                           registered))
+                        "question?".format(not_registered_names, instance,
+                                           registered_names))
             else:
                 # PyTorch automatically tracks nn.Modules inside the parent
                 # nn.Module's constructor.
